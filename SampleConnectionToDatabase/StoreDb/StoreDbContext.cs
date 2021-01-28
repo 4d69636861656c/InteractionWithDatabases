@@ -10,7 +10,7 @@ namespace SampleConnectionToDatabase.StoreDb
     public class StoreDbContext
     {
         #region Private Members 
-        private const string ConnectionString = @"Data Source=DESKTOP-RT3NQPU\SQLEXPRESS; Initial Catalog=MyOrdersDB; Integrated Security=True";
+        private const string ConnectionString = "Data Source=DESKTOP-LOFN77V; Initial Catalog=MyOrdersDB; Integrated Security=True";
         private readonly SqlConnection _sqlConnection;
         #endregion
 
@@ -36,7 +36,7 @@ namespace SampleConnectionToDatabase.StoreDb
 
         #region Public Methods
 
-        #region Read From Table 
+        #region Read From Tables 
         /// <summary>
         /// Reads all the rows in a table.
         /// </summary>
@@ -46,20 +46,27 @@ namespace SampleConnectionToDatabase.StoreDb
         {
             string tableName = GetTableName(table);
 
-            _sqlConnection.Open();
-            using (SqlCommand selectCommand = new SqlCommand($"SELECT * FROM {tableName}", _sqlConnection))
+            if (table == TableNameEnum.Users || table == TableNameEnum.Categories)
             {
-                selectCommand.CommandType = CommandType.Text;
-                using (SqlDataAdapter sda = new SqlDataAdapter(selectCommand))
+                this._sqlConnection.Open();
+                using (SqlCommand selectCommand = new SqlCommand($"SELECT * FROM {tableName}", this._sqlConnection))
                 {
-                    using (DataTable dataTable = new DataTable())
+                    selectCommand.CommandType = CommandType.Text;
+                    using (SqlDataAdapter sda = new SqlDataAdapter(selectCommand))
                     {
-                        sda.Fill(dataTable);
-                        _sqlConnection.Close();
+                        using (DataTable dataTable = new DataTable())
+                        {
+                            sda.Fill(dataTable);
+                            this._sqlConnection.Close();
 
-                        return dataTable;
+                            return dataTable;
+                        }
                     }
                 }
+            }
+            else
+            {
+                return this.ReadProductsTable();
             }
         }
         #endregion
@@ -77,12 +84,12 @@ namespace SampleConnectionToDatabase.StoreDb
                 return false;
             }
 
-            _sqlConnection.Open();
-            using (SqlCommand insertCommand = new SqlCommand($"IF OBJECTPROPERTY(OBJECT_ID('dbo.OrderData'), 'TableHasIdentity') = 1\r\n" +
-                                                             $"SET IDENTITY_INSERT [dbo].[OrderData] ON " +
-                                                             $"INSERT INTO Users (UserName, UserPassword, Email, Phone, CreatedOn, Active) " +
-                                                             $"VALUES (@UserName, @UserPassword, @Email, @Phone, @CreatedOn, @Active) " +
-                                                             $"SET IDENTITY_INSERT [dbo].[OrderData] OFF", _sqlConnection))
+            this._sqlConnection.Open();
+            using (SqlCommand insertCommand = new SqlCommand($"IF OBJECTPROPERTY(OBJECT_ID('dbo.Users'), 'TableHasIdentity') = 1\r\n"
+                                                             /*+$"SET IDENTITY_INSERT [dbo].[Users] ON " +*/
+                                                             +$"INSERT INTO Users (UserName, UserPassword, Email, Phone, CreatedOn, Active) "
+                                                             + $"VALUES (@UserName, @UserPassword, @Email, @Phone, @CreatedOn, @Active) "
+                                                             /*$"SET IDENTITY_INSERT [dbo].[Users] OFF"*/, _sqlConnection))
             {
                 insertCommand.CommandType = CommandType.Text;
                 using (new SqlDataAdapter(insertCommand))
@@ -95,7 +102,40 @@ namespace SampleConnectionToDatabase.StoreDb
                     insertCommand.Parameters.AddWithValue("@Active", user.Active);
 
                     int rowsAdded = insertCommand.ExecuteNonQuery();
-                    _sqlConnection.Close();
+                    this._sqlConnection.Close();
+
+                    return rowsAdded > 0;
+                }
+            }
+        }
+
+        public bool InsertProduct(Product product)
+        {
+            if (string.IsNullOrEmpty(product.Name) || string.IsNullOrEmpty(product.Price) || !double.TryParse(product.Price, out _) || !double.TryParse(product.Discount, out _))
+            {
+                return false;
+            }
+
+            this._sqlConnection.Open();
+            using (SqlCommand insertCommand = new SqlCommand($"IF OBJECTPROPERTY(OBJECT_ID('dbo.Products'), 'TableHasIdentity') = 1\r\n"
+                                                             /*+ $"SET IDENTITY_INSERT [dbo].[Products] ON "*/
+                                                             + $"INSERT INTO Products (CategoryID, Name, Price, Discount, Description, CreatedOn, EditedOn)\r\n"
+                                                             + $"VALUES (@CategoryId, @Name, @Price, @Discount, @Description, @CreatedOn, @EditedOn)\r\n"
+                                                             /*+ $"SET IDENTITY_INSERT [dbo].[Products] OFF"*/, _sqlConnection))
+            {
+                insertCommand.CommandType = CommandType.Text;
+                using (new SqlDataAdapter(insertCommand))
+                {
+                    insertCommand.Parameters.AddWithValue("@CategoryId", product.CategoryId);
+                    insertCommand.Parameters.AddWithValue("@Name", product.Name);
+                    insertCommand.Parameters.AddWithValue("@Price", product.Price);
+                    insertCommand.Parameters.AddWithValue("@Discount", product.Discount);
+                    insertCommand.Parameters.AddWithValue("@Description", product.Description);
+                    insertCommand.Parameters.AddWithValue("@CreatedOn", product.CreatedOn);
+                    insertCommand.Parameters.AddWithValue("@EditedOn", product.EditedOn);
+
+                    int rowsAdded = insertCommand.ExecuteNonQuery();
+                    this._sqlConnection.Close();
 
                     return rowsAdded > 0;
                 }
@@ -103,7 +143,7 @@ namespace SampleConnectionToDatabase.StoreDb
         }
         #endregion
 
-        #region Update Row
+        #region Update Rows
         /// <summary>
         /// Updates a row from the users table.
         /// </summary>
@@ -116,8 +156,11 @@ namespace SampleConnectionToDatabase.StoreDb
                 return false;
             }
 
-            _sqlConnection.Open();
-            using (SqlCommand updateCommand = new SqlCommand($"UPDATE Users\r\nSET Users.UserName = @UserName, Users.UserPassword = @UserPassword, Users.Email = @Email, Users.Phone = @Phone, Users.CreatedOn = @CreatedOn, Users.Active = @Active\r\nWHERE Users.UserID = @UserId;", _sqlConnection))
+            this._sqlConnection.Open();
+            using (SqlCommand updateCommand = new SqlCommand($"UPDATE Users\r\n"
+                                                             + $"SET Users.UserName = @UserName, Users.UserPassword = @UserPassword, "
+                                                             + $"Users.Email = @Email, Users.Phone = @Phone, Users.CreatedOn = @CreatedOn, Users.Active = @Active\r\n"
+                                                             + $"WHERE Users.UserID = @UserId;", _sqlConnection))
             {
                 updateCommand.CommandType = CommandType.Text;
                 using (new SqlDataAdapter(updateCommand))
@@ -131,7 +174,40 @@ namespace SampleConnectionToDatabase.StoreDb
                     updateCommand.Parameters.AddWithValue("@Active", user.Active);
 
                     int rowsAffected = updateCommand.ExecuteNonQuery();
-                    _sqlConnection.Close();
+                    this._sqlConnection.Close();
+
+                    return rowsAffected > 0;
+                }
+            }
+        }
+
+        public bool UpdateProduct(Product product)
+        {
+            if (string.IsNullOrEmpty(product.Name) || string.IsNullOrEmpty(product.Price) || !double.TryParse(product.Price, out _) || !double.TryParse(product.Discount, out _))
+            {
+                return false;
+            }
+
+            this._sqlConnection.Open();
+            using (SqlCommand updateCommand = new SqlCommand($"UPDATE Products\r\n"
+                                                             + $"SET Products.CategoryID = @CategoryId, Products.Name = @Name, Products.Price = @Price, "
+                                                             + $"Products.Discount = @Discount, Products.Description = @Description, "
+                                                             + $"Products.EditedOn = @EditedOn\r\n"
+                                                             + $"WHERE Products.ProductID = @ProductId;", _sqlConnection))
+            {
+                updateCommand.CommandType = CommandType.Text;
+                using (new SqlDataAdapter(updateCommand))
+                {
+                    updateCommand.Parameters.AddWithValue("@ProductId", product.ProductId);
+                    updateCommand.Parameters.AddWithValue("@CategoryId", product.CategoryId);
+                    updateCommand.Parameters.AddWithValue("@Name", product.Name);
+                    updateCommand.Parameters.AddWithValue("@Price", product.Price);
+                    updateCommand.Parameters.AddWithValue("@Discount", product.Discount);
+                    updateCommand.Parameters.AddWithValue("@Description", product.Description);
+                    updateCommand.Parameters.AddWithValue("@EditedOn", product.EditedOn);
+
+                    int rowsAffected = updateCommand.ExecuteNonQuery();
+                    this._sqlConnection.Close();
 
                     return rowsAffected > 0;
                 }
@@ -239,6 +315,27 @@ namespace SampleConnectionToDatabase.StoreDb
             }
 
             return tableName;
+        }
+
+        private DataTable ReadProductsTable()
+        {
+            this._sqlConnection.Open();
+            using (SqlCommand selectCommand = new SqlCommand($"SELECT \r\n\tp.ProductID,\r\n\tp.Name,\r\n\tc.Name,\r\n\tp.Price,\r\n\tp.Discount,\r\n\tp.Description,\r\n\tp.CreatedOn,\r\n\tp.EditedOn\r\nFROM\r\ndbo.Products p\r\nINNER JOIN Category c \r\nON c.CategoryID = p.CategoryID\r\nORDER BY\r\np.Name DESC;", this._sqlConnection))
+            {
+                selectCommand.CommandType = CommandType.Text;
+                using (SqlDataAdapter sda = new SqlDataAdapter(selectCommand))
+                {
+                    using (DataTable dataTable = new DataTable())
+                    {
+                        sda.Fill(dataTable);
+                        this._sqlConnection.Close();
+
+                        dataTable.Columns["Name1"].ColumnName = "Category";
+
+                        return dataTable;
+                    }
+                }
+            }
         }
         #endregion
     }
