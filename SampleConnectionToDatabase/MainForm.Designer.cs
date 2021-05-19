@@ -58,11 +58,22 @@ namespace SampleConnectionToDatabase
             this.productNameTextBox = new System.Windows.Forms.TextBox();
             this.productsDataGridView = new System.Windows.Forms.DataGridView();
             this.createProductButton = new System.Windows.Forms.Button();
+            this.categoriesTabPage = new System.Windows.Forms.TabPage();
+            this.deleteCategoryButton = new System.Windows.Forms.Button();
+            this.updateCategoryButton = new System.Windows.Forms.Button();
+            this.categoryDescriptionLabel = new System.Windows.Forms.Label();
+            this.categoryDescriptionTextBox = new System.Windows.Forms.TextBox();
+            this.categoryNameLabel = new System.Windows.Forms.Label();
+            this.categoryNameTextBox = new System.Windows.Forms.TextBox();
+            this.categoriesDataGridView = new System.Windows.Forms.DataGridView();
+            this.createCategoryButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.usersDataGridView)).BeginInit();
             this.mainTabControl.SuspendLayout();
             this.usersTabPage.SuspendLayout();
             this.productsTabPage.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.productsDataGridView)).BeginInit();
+            this.categoriesTabPage.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.categoriesDataGridView)).BeginInit();
             this.SuspendLayout();
             // 
             // createUserButton
@@ -88,6 +99,7 @@ namespace SampleConnectionToDatabase
             // 
             this.mainTabControl.Controls.Add(this.usersTabPage);
             this.mainTabControl.Controls.Add(this.productsTabPage);
+            this.mainTabControl.Controls.Add(this.categoriesTabPage);
             this.mainTabControl.Location = new System.Drawing.Point(12, 12);
             this.mainTabControl.Name = "mainTabControl";
             this.mainTabControl.SelectedIndex = 0;
@@ -256,6 +268,7 @@ namespace SampleConnectionToDatabase
             this.deleteProductButton.TabIndex = 23;
             this.deleteProductButton.Text = "Delete Product";
             this.deleteProductButton.UseVisualStyleBackColor = false;
+            this.deleteProductButton.Click += new System.EventHandler(this.DeleteProductButton_Click);
             // 
             // updateProductButton
             // 
@@ -355,6 +368,99 @@ namespace SampleConnectionToDatabase
             this.createProductButton.UseVisualStyleBackColor = false;
             this.createProductButton.Click += new System.EventHandler(this.CreateProductButton_Click);
             // 
+            // categoriesTabPage
+            // 
+            this.categoriesTabPage.Controls.Add(this.deleteCategoryButton);
+            this.categoriesTabPage.Controls.Add(this.updateCategoryButton);
+            this.categoriesTabPage.Controls.Add(this.categoryDescriptionLabel);
+            this.categoriesTabPage.Controls.Add(this.categoryDescriptionTextBox);
+            this.categoriesTabPage.Controls.Add(this.categoryNameLabel);
+            this.categoriesTabPage.Controls.Add(this.categoryNameTextBox);
+            this.categoriesTabPage.Controls.Add(this.categoriesDataGridView);
+            this.categoriesTabPage.Controls.Add(this.createCategoryButton);
+            this.categoriesTabPage.Location = new System.Drawing.Point(4, 22);
+            this.categoriesTabPage.Name = "categoriesTabPage";
+            this.categoriesTabPage.Padding = new System.Windows.Forms.Padding(3);
+            this.categoriesTabPage.Size = new System.Drawing.Size(768, 398);
+            this.categoriesTabPage.TabIndex = 2;
+            this.categoriesTabPage.Text = "Categories";
+            this.categoriesTabPage.UseVisualStyleBackColor = true;
+            // 
+            // deleteCategoryButton
+            // 
+            this.deleteCategoryButton.BackColor = System.Drawing.Color.Red;
+            this.deleteCategoryButton.Location = new System.Drawing.Point(660, 294);
+            this.deleteCategoryButton.Name = "deleteCategoryButton";
+            this.deleteCategoryButton.Size = new System.Drawing.Size(102, 46);
+            this.deleteCategoryButton.TabIndex = 19;
+            this.deleteCategoryButton.Text = "Delete Category";
+            this.deleteCategoryButton.UseVisualStyleBackColor = false;
+            this.deleteCategoryButton.Click += new System.EventHandler(this.DeleteCategoryButton_Click);
+            // 
+            // updateCategoryButton
+            // 
+            this.updateCategoryButton.BackColor = System.Drawing.Color.SteelBlue;
+            this.updateCategoryButton.Location = new System.Drawing.Point(552, 346);
+            this.updateCategoryButton.Name = "updateCategoryButton";
+            this.updateCategoryButton.Size = new System.Drawing.Size(102, 46);
+            this.updateCategoryButton.TabIndex = 18;
+            this.updateCategoryButton.Text = "Update Category";
+            this.updateCategoryButton.UseVisualStyleBackColor = false;
+            this.updateCategoryButton.Click += new System.EventHandler(this.UpdateCategoryButton_Click);
+            // 
+            // categoryDescriptionLabel
+            // 
+            this.categoryDescriptionLabel.AutoSize = true;
+            this.categoryDescriptionLabel.Location = new System.Drawing.Point(291, 363);
+            this.categoryDescriptionLabel.Name = "categoryDescriptionLabel";
+            this.categoryDescriptionLabel.Size = new System.Drawing.Size(60, 13);
+            this.categoryDescriptionLabel.TabIndex = 17;
+            this.categoryDescriptionLabel.Text = "Description";
+            // 
+            // categoryDescriptionTextBox
+            // 
+            this.categoryDescriptionTextBox.Location = new System.Drawing.Point(374, 360);
+            this.categoryDescriptionTextBox.MaxLength = 100;
+            this.categoryDescriptionTextBox.Name = "categoryDescriptionTextBox";
+            this.categoryDescriptionTextBox.Size = new System.Drawing.Size(141, 20);
+            this.categoryDescriptionTextBox.TabIndex = 16;
+            // 
+            // categoryNameLabel
+            // 
+            this.categoryNameLabel.AutoSize = true;
+            this.categoryNameLabel.Location = new System.Drawing.Point(11, 363);
+            this.categoryNameLabel.Name = "categoryNameLabel";
+            this.categoryNameLabel.Size = new System.Drawing.Size(80, 13);
+            this.categoryNameLabel.TabIndex = 15;
+            this.categoryNameLabel.Text = "Category Name";
+            // 
+            // categoryNameTextBox
+            // 
+            this.categoryNameTextBox.Location = new System.Drawing.Point(95, 360);
+            this.categoryNameTextBox.MaxLength = 35;
+            this.categoryNameTextBox.Name = "categoryNameTextBox";
+            this.categoryNameTextBox.Size = new System.Drawing.Size(141, 20);
+            this.categoryNameTextBox.TabIndex = 14;
+            // 
+            // categoriesDataGridView
+            // 
+            this.categoriesDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.categoriesDataGridView.Location = new System.Drawing.Point(6, 6);
+            this.categoriesDataGridView.Name = "categoriesDataGridView";
+            this.categoriesDataGridView.Size = new System.Drawing.Size(756, 276);
+            this.categoriesDataGridView.TabIndex = 13;
+            // 
+            // createCategoryButton
+            // 
+            this.createCategoryButton.BackColor = System.Drawing.Color.Green;
+            this.createCategoryButton.Location = new System.Drawing.Point(660, 346);
+            this.createCategoryButton.Name = "createCategoryButton";
+            this.createCategoryButton.Size = new System.Drawing.Size(102, 46);
+            this.createCategoryButton.TabIndex = 12;
+            this.createCategoryButton.Text = "Create Category";
+            this.createCategoryButton.UseVisualStyleBackColor = false;
+            this.createCategoryButton.Click += new System.EventHandler(this.CreateCategoryButton_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -371,6 +477,9 @@ namespace SampleConnectionToDatabase
             this.productsTabPage.ResumeLayout(false);
             this.productsTabPage.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.productsDataGridView)).EndInit();
+            this.categoriesTabPage.ResumeLayout(false);
+            this.categoriesTabPage.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.categoriesDataGridView)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -406,6 +515,15 @@ namespace SampleConnectionToDatabase
         private System.Windows.Forms.Button createProductButton;
         private System.Windows.Forms.Label productCategoryLabel;
         private System.Windows.Forms.ComboBox productCategoryComboBox;
+        private System.Windows.Forms.TabPage categoriesTabPage;
+        private System.Windows.Forms.Button deleteCategoryButton;
+        private System.Windows.Forms.Button updateCategoryButton;
+        private System.Windows.Forms.Label categoryDescriptionLabel;
+        private System.Windows.Forms.TextBox categoryDescriptionTextBox;
+        private System.Windows.Forms.Label categoryNameLabel;
+        private System.Windows.Forms.TextBox categoryNameTextBox;
+        private System.Windows.Forms.DataGridView categoriesDataGridView;
+        private System.Windows.Forms.Button createCategoryButton;
     }
 }
 
